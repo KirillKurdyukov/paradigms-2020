@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="core.specs.alpha-0.2.44">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/clojure/lib/core.specs.alpha-0.2.44.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="jar://$PROJECT_DIR$/clojure/lib/core.specs.alpha-0.2.44.jar!/" recursive="false" />
+  </library>
+</component>
