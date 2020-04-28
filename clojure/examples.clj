@@ -13,3 +13,9 @@
 (load-file "examples/2_3_evaluation-orders.clj")
 (load-file "examples/2_4_streams.clj")
 (load-file "examples/2_5_maps.clj")
+
+(lecture "3. Objects and evaluation")
+(load-file "examples/3_1_js-objects.clj")
+(load-file "examples/3_2_java-objects.clj")
+(load-file "examples/3_3_mutable-state.clj")
+(load-file "examples/3_4_church.clj")
