@@ -24,6 +24,11 @@
         * `min` – минимум, `(min 1 2 6)` равно 1;
         * `max` – максимум, `(min 1 2 6)` равно 6;
     * [Исходный код тестов](clojure/cljtest/functional/ClojureFunctionalMinMaxTest.java)
+ * *ExpLn*. Дополнительно реализовать поддержку:
+    * унарных операций:
+        * `exp` – экспонента, `(exp 8)` примерно равно 2981;
+        * `ln`  – натуральный логарифм абсолютной величины, `(ln -2981)` примерно равно 8.
+    * [Исходный код тестов](clojure/cljtest/functional/ClojureFunctionalExpLnTest.java)
 
 ## Домашнее задание 9. Линейная алгебра на Clojure
 
