@@ -29,6 +29,22 @@
         * `exp` – экспонента, `(exp 8)` примерно равно 2981;
         * `ln`  – натуральный логарифм абсолютной величины, `(ln -2981)` примерно равно 8.
     * [Исходный код тестов](clojure/cljtest/functional/ClojureFunctionalExpLnTest.java)
+ * *MedAvg*. Дополнительно реализовать поддержку:
+    * операций произвольного числа аргументов:
+        * `med` – медиана, `(med 1 2 6)` равно 2;
+        * `avg` – среднее, `(avg 1 2 6)` равно 3;
+    * [Исходный код тестов](clojure/cljtest/functional/ClojureFunctionalMedAvgTest.java)
+ * *PwLg*. Дополнительно реализовать поддержку:
+    * бинарных операций:
+        * `pw` – возведение в степень, `(pow 2 3)` равно 8;
+        * `lg` – логарифм абсолютной величины по основанию абсолютной величины, `(lg -8 -2)` равно 3.
+    * [Исходный код тестов](clojure/cljtest/functional/ClojureFunctionalPwLgTest.java)
+ * *SumexpSoftmax*. Дополнительно реализовать поддержку:
+    * операций произвольного числа аргументов:
+        * `sumexp` – сумма экспонент, `(sumexp 8 8 9)` примерно равно 14065;
+        * `softmax` – [softmax](https://ru.wikipedia.org/wiki/Softmax) первого аргумента, `(softmax 1 2 3)` примерно равно 0.09;
+    * [Исходный код тестов](clojure/cljtest/functional/ClojureFunctionalSumexpSoftmaxTest.java)
+
 
 ## Домашнее задание 9. Линейная алгебра на Clojure
 
