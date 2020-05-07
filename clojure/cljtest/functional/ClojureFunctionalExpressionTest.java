@@ -29,7 +29,7 @@ public class ClojureFunctionalExpressionTest extends BaseJavascriptTest<ClojureE
     );
 
     protected ClojureFunctionalExpressionTest(final Language language, final Optional<String> evaluate) {
-        super(new ClojureEngine("expressionHW10.clj", evaluate), language, true);
+        super(new ClojureEngine("expression.clj", evaluate), language, true);
     }
 
     protected ClojureFunctionalExpressionTest(final AbstractTests tests) {

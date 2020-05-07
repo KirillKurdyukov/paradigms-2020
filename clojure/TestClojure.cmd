@@ -14,3 +14,5 @@ javac ^
     -ea ^
     "--class-path=%~dp0/lib/*;__out" ^
     "%test%" "%~2"
+echo Current directory: %cd%
+echo Scripts directory: %~dp0
