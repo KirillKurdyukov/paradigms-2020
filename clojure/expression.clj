@@ -1,64 +1,39 @@
 (definterface Expression
   (diff [str])
   (evaluate [values]))
-
 (declare zero Divide Multiply Add Subtract Negate)
-
 (deftype Const [c]
   Object
   (toString [this] (format "%.1f" c))
   Expression
   (evaluate [this values] c)
   (diff [this str] zero))
-
 (def zero (new Const 0))
 (def one (new Const 1))
-
 (deftype V [argName]
   Object
   (toString [this] argName)
   Expression
   (evaluate [this m] (get m argName))
   (diff [this str] (if (= str argName) one zero)))
-
 (defn Constant [val] (new Const val))
 (defn Variable [argName] (new V argName))
-
-(deftype A [f s]
+(deftype Operation [operation ownDiff stringOperation args]
   Object
-  (toString [this] (str "(" "+ " (.toString f) " " (.toString s) ")"))
+  (toString [this] (str "(" stringOperation " " (clojure.string/join " " args) ")"))
   Expression
-  (evaluate [this m] (+ (.evaluate f m) (.evaluate s m)))
-  (diff [this str] (Add (.diff f str) (.diff s str))))
-(deftype S [f s]
-  Object
-  (toString [this] (str "(" "- " (.toString f) " " (.toString s) ")"))
-  Expression
-  (evaluate [this m] (- (.evaluate f m) (.evaluate s m)))
-  (diff [this str] (Subtract (.diff f str) (.diff s str))))
-(deftype M [f s]
-  Object
-  (toString [this] (str "(" "* " (.toString f) " " (.toString s) ")"))
-  Expression
-  (evaluate [this m] (* (.evaluate f m) (.evaluate s m)))
-  (diff [this str] (Add (Multiply (.diff f str) s) (Multiply f (.diff s str)))))
-(deftype D [f s]
-  Object
-  (toString [this] (str "(" "/ " (.toString f) " " (.toString s) ")"))
-  Expression
-  (evaluate [this m] (/ (double (.evaluate f m)) (double (.evaluate s m))))
-  (diff [this str] (Divide (Subtract (Multiply (.diff f str) s) (Multiply f (.diff s str))) (Multiply s s))))
-(deftype N [one]
-  Object
-  (toString [this] (str "(" "negate " (.toString one) ")"))
-  Expression
-  (evaluate [this m] (- (.evaluate one m)))
-  (diff [this str] (Negate (.diff one str))))
-(defn Add [a b] (new A a b))
-(defn Subtract [a b] (new S a b))
-(defn Multiply [a b] (new M a b))
-(defn Divide [a b] (new D a b))
-(defn Negate [one] (new N one))
+  (evaluate [this m] (apply operation (mapv (fn [x] (.evaluate x m)) args)))
+  (diff [this str]  (ownDiff str args)))
+(defn Add [a b]
+  (new Operation + (fn [str args] (apply Add (mapv (fn [x] (.diff x str)) args))) "+" [a b]))
+(defn Subtract [a b]
+  (new Operation - (fn [str args] (apply Subtract (mapv (fn [x] (.diff x str)) args))) "-" [a b]))
+(defn Multiply [a b]
+  (new Operation * (fn [str [f s]] (Add (Multiply (.diff f str) s) (Multiply f (.diff s str)))) "*" [a b]))
+(defn Divide [a b]
+  (new Operation (fn [f s] (/ (double f) (double s))) (fn [str [f s]] (Divide (Subtract (Multiply (.diff f str) s) (Multiply f (.diff s str))) (Multiply s s))) "/" [a b]))
+(defn Negate [one]
+  (new Operation - (fn [str args] (apply Negate (mapv (fn [x] (.diff x str)) args))) "negate" [one]))
 (defn evaluate [expr m]
   (.evaluate expr m))
 (defn diff [expr str]
