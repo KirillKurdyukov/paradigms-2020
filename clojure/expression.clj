@@ -2,7 +2,7 @@
   (diff [str])
   (evaluate [values]))
 
-(declare zero)
+(declare zero diff)
 
 (deftype Const [c]
   Object
@@ -47,14 +47,11 @@
 (defn Negate [one]
   (new Operation - (fn [str args] (apply Negate (mapv (fn [x] (.diff x str)) args))) "negate" [one]))
 
-(defn Negate [one]
-  (new Operation - (fn [str args] (apply Negate (mapv (fn [x] (.diff x str)) args))) "negate" [one]))
-
 (defn Exp [one]
-  (new Operation (fn [x] (Math/exp x)) (fn [str & args]  (Multiply (Exp args) (.diff args str))) "exp" [one]))
+  (new Operation (fn [x] (Math/exp x)) (fn [str args]  (Multiply (Exp (first args)) (.diff (first args) str))) "exp" [one]))
 
 (defn Ln [one]
-  (new Operation (fn [x] (Math/log (Math/abs x))) (fn [str & args] (Multiply (Divide (Constant 1) args) (.diff args str))) "ln" [one]))
+  (new Operation (fn [x] (Math/log (Math/abs x))) (fn [str args] (Multiply (Divide (Constant 1) (first args)) (.diff (first args) str))) "ln" [one]))
 
 (defn evaluate [expr m]
   (.evaluate expr m))
