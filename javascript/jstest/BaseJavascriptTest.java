@@ -25,7 +25,7 @@ public abstract class BaseJavascriptTest<E extends Engine> extends BaseTest {
     }
 
     private static boolean safe(final char ch) {
-        return !Character.isLetterOrDigit(ch) && "+-*/.".indexOf(ch) == -1;
+        return !Character.isLetterOrDigit(ch) && "+-*/.<>=".indexOf(ch) == -1;
     }
 
     protected static String addSpaces(final String expression, final Random random) {

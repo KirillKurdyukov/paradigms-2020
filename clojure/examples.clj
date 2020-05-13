@@ -19,3 +19,9 @@
 (load-file "examples/3_2_java-objects.clj")
 (load-file "examples/3_3_mutable-state.clj")
 (load-file "examples/3_4_church.clj")
+
+(lecture "4. Parser combinators")
+(load-file "examples/4_1_base.clj")
+(load-file "examples/4_2_combinators.clj")
+(load-file "examples/4_3_json.clj")
+(load-file "examples/4_4_macro.clj")
