@@ -9,7 +9,7 @@
          (tabulate (+char-not "abc") ["a" "a~" "b" "b~" "" "x" "x~"]))
 (example "+map: map result"
          (defn +map [f parser] (comp (partial _map f) parser))
-         (tabulate (+map clojure.string/upper-case (+char "abc")) ["a" "a~" "b" "b~" "" "x" "x~"]))
+         (tabulate (+map #(Character/toUpperCase %) (+char "abc")) ["a" "a~" "b" "b~" "" "x" "x~"]))
 (example "import"
          (def +parser _parser))
 
@@ -23,7 +23,7 @@
          (defn +seq [& ps]
            (reduce (partial _combine iconj) (_empty []) ps))
          (tabulate (+seq (+char "abc") (+ignore (+char "xyz")) (+char "ABC")) ["axA~" "axA" "aXA~"]))
-(example "+seqf: +sequence with function"
+(example "+seqf: sequence with function"
          (defn +seqf [f & ps] (+map (partial apply f) (apply +seq ps)))
          (tabulate (+seqf str (+char "abc") (+ignore (+char "xyz")) (+char "ABC")) ["axA~" "axA" "aXA~"]))
 (example "+seqn: n-th element of the sequence"

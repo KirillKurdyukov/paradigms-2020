@@ -24,6 +24,21 @@
         * `Exp` (`exp`) – экспонента, `(exp 8)` примерно равно 2981;
         * `Ln`  (`Ln`)  – натуральный логарифм абсолютной величины, `(lg 2981)` примерно равно 8.
     * [Исходный код тестов](clojure/cljtest/object/ClojureObjectExpLnTest.java)
+ * *SumAvg*. Дополнительно реализовать поддержку:
+    * операций произвольного числа аргументов:
+        * `Sum` (`sum`) – сумма, `(sum 1 2 3)` равно 6;
+        * `Avg` (`avg`) – арифметическое среднее, `(avg 1 2 3)` равно 2;
+    * [Исходный код тестов](clojure/cljtest/object/ClojureObjectSumAvgTest.java)
+ * *SquareSqrt*. Дополнительно реализовать поддержку:
+    * унарных операций:
+        * `Square` (`square`) – возведение в квадрат, `(square 3)` равно 9;
+        * `Sqrt` (`sqrt`) – извлечение квадратного корня из абсолютной величины аргумента, `(sqrt -9)` равно 3.
+    * [Исходный код тестов](clojure/cljtest/object/ClojureObjectSquareSqrtTest.java)
+ * *SumexpSoftmax*. Дополнительно реализовать поддержку:
+    * операций произвольного числа аргументов:
+        * `Sumexp` (`sumexp`) – сумма экспонент, `(sumexp 8 8 9)` примерно равно 14065;
+        * `Softmax` (`Softmax`) – [softmax](https://ru.wikipedia.org/wiki/Softmax) первого аргумента, `(softmax 1 2 3)` примерно равно 0.09;
+    * [Исходный код тестов](clojure/cljtest/object/ClojureObjectSumexpSoftmaxTest.java)
 
 
 ## Домашнее задание 10. Функциональные выражения на Clojure

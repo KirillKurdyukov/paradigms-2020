@@ -10,12 +10,12 @@
            (if (-valid? result) (str "-> " (pr-str (-value result)) " | " (pr-str (apply str (-tail result))))
                                 "!"))
          (defn tabulate [parser inputs]
-           (run! (fn [input] (printf "    %-10s %s\n" input (_show (parser input)))) inputs)))
+           (run! (fn [input] (printf "    %-10s %s\n" (pr-str input) (_show (parser input)))) inputs)))
 
 (section "Basic parsers")
 (example "_empty: empty parser"
          (defn _empty [value] (partial -return value))
-         (tabulate (_empty nil) ["" "~"]))
+         (tabulate (_empty 1) ["" "~"]))
 (example "_char: single character matching predicate"
          (defn _char [p]
            (fn [[c & cs]]
@@ -25,7 +25,7 @@
          (defn _map [f result]
            (if (-valid? result)
              (-return (f (-value result)) (-tail result))))
-         (tabulate (comp (partial _map clojure.string/upper-case) (_char #{\a \b \c})) ["a" "a~" "b" "b~" "" "x" "x~"]))
+         (tabulate (comp (partial _map #(Character/toUpperCase %)) (_char #{\a \b \c})) ["a" "a~" "b" "b~" "" "x" "x~"]))
 
 (section "Basic combinators")
 (example "_combine: combine two parsers"
