@@ -32,11 +32,13 @@
   (evaluate [this m] (apply operation (mapv (fn [x] (.evaluate x m)) args)))
   (diff [this str]  (ownDiff str args)))
 
+(defn p-operand [args str] (mapv (fn [x] (.diff x str)) args))
+
 (defn Add [a b]
-  (new Operation + (fn [str args] (apply Add (mapv (fn [x] (.diff x str)) args))) "+" [a b]))
+  (new Operation + (fn [str args] (apply Add (p-operand args str))) "+" [a b]))
 
 (defn Subtract [a b]
-  (new Operation - (fn [str args] (apply Subtract (mapv (fn [x] (.diff x str)) args))) "-" [a b]))
+  (new Operation - (fn [str args] (apply Subtract (p-operand args str))) "-" [a b]))
 
 (defn Multiply [a b]
   (new Operation * (fn [str [f s]] (Add (Multiply (.diff f str) s) (Multiply f (.diff s str)))) "*" [a b]))
@@ -68,8 +70,8 @@
                    "/"      Divide
                    "*"      Multiply
                    "negate" Negate
-                   "exp" Exp
-                   "ln" Ln
+                   "exp"    Exp
+                   "ln"     Ln
                    })
 (defn parse [expression] (cond (number? expression) (Constant expression)
                                (isVariable expression) (Variable (name expression))
