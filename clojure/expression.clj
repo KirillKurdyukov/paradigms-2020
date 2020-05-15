@@ -2,7 +2,7 @@
   (diff [str])
   (evaluate [values]))
 
-(declare zero diff)
+(declare zero)
 
 (deftype Const [c]
   Object
@@ -30,7 +30,7 @@
   (toString [this] (str "(" stringOperation " " (clojure.string/join " " args) ")"))
   Expression
   (evaluate [this m] (apply operation (mapv (fn [x] (.evaluate x m)) args)))
-  (diff [this str]  (ownDiff str args)))
+  (diff [this str] (ownDiff str args)))
 
 (defn p-operand [oper args str] (apply oper (mapv (fn [x] (.diff x str)) args)))
 
@@ -50,7 +50,7 @@
   (new Operation - (fn [str args] (p-operand Negate args str)) "negate" one))
 
 (defn Exp [one]
-  (new Operation (fn [x] (Math/exp x)) (fn [str args]  (Multiply (Exp (first args)) (.diff (first args) str))) "exp" [one]))
+  (new Operation (fn [x] (Math/exp x)) (fn [str args] (Multiply (Exp (first args)) (.diff (first args) str))) "exp" [one]))
 
 (defn Ln [one]
   (new Operation (fn [x] (Math/log (Math/abs x))) (fn [str args] (Multiply (Divide (Constant 1) (first args)) (.diff (first args) str))) "ln" [one]))
