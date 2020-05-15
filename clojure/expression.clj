@@ -34,20 +34,20 @@
 
 (defn p-operand [oper args str] (apply oper (mapv (fn [x] (.diff x str)) args)))
 
-(defn Add [a b]
-  (new Operation + (fn [str args] (p-operand Add args str)) "+" [a b]))
+(defn Add [& args]
+  (new Operation + (fn [str args] (p-operand Add args str)) "+" args))
 
-(defn Subtract [a b]
-  (new Operation - (fn [str args] (p-operand Subtract args str)) "-" [a b]))
+(defn Subtract [& args]
+  (new Operation - (fn [str args] (p-operand Subtract args str)) "-" args))
 
-(defn Multiply [a b]
-  (new Operation * (fn [str [f s]] (Add (Multiply (.diff f str) s) (Multiply f (.diff s str)))) "*" [a b]))
+(defn Multiply [& args]
+  (new Operation * (fn [str args] (reduce (fn [f s] (Add (Multiply (.diff f str) s) (Multiply f (.diff s str)))) args)) "*" args))
 
-(defn Divide [a b]
-  (new Operation (fn [f s] (/ (double f) (double s))) (fn [str [f s]] (Divide (Subtract (Multiply (.diff f str) s) (Multiply f (.diff s str))) (Multiply s s))) "/" [a b]))
+(defn Divide [& args]
+  (new Operation (fn [f s] (/ (double f) (double s))) (fn [str args] (reduce (fn [f s] (Divide (Subtract (Multiply (.diff f str) s) (Multiply f (.diff s str))) (Multiply s s))) args)) "/" args))
 
-(defn Negate [one]
-  (new Operation - (fn [str args] (apply Negate (mapv (fn [x] (.diff x str)) args))) "negate" [one]))
+(defn Negate [& one]
+  (new Operation - (fn [str args] (p-operand Negate args str)) "negate" one))
 
 (defn Exp [one]
   (new Operation (fn [x] (Math/exp x)) (fn [str args]  (Multiply (Exp (first args)) (.diff (first args) str))) "exp" [one]))
