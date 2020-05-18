@@ -46,14 +46,14 @@
 (defn Divide [& args]
   (new Operation (fn [f s] (/ (double f) (double s))) (fn [str [f s]] (Divide (Subtract (Multiply (.diff f str) s) (Multiply f (.diff s str))) (Multiply s s))) "/" args))
 
-(defn Negate [& one]
-  (new Operation - (fn [str args] (p-operand Negate args str)) "negate" one))
+(defn Negate [& args]
+  (new Operation - (fn [str args] (p-operand Negate args str)) "negate" args))
 
-(defn Exp [& one]
-  (new Operation (fn [x] (Math/exp x)) (fn [str args] (Multiply (Exp (first args)) (.diff (first args) str))) "exp" one))
+(defn Exp [& args]
+  (new Operation (fn [x] (Math/exp x)) (fn [str args] (Multiply (Exp (first args)) (.diff (first args) str))) "exp" args))
 
-(defn Ln [& one]
-  (new Operation (fn [x] (Math/log (Math/abs x))) (fn [str args] (Multiply (Divide (Constant 1) (first args)) (.diff (first args) str))) "ln" one))
+(defn Ln [& args]
+  (new Operation (fn [x] (Math/log (Math/abs x))) (fn [str args] (Multiply (Divide one (first args)) (.diff (first args) str))) "ln" args))
 
 (defn evaluate [expr m]
   (.evaluate expr m))
