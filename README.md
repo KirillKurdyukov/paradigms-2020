@@ -3,6 +3,28 @@
 [Условия домашних заданий](http://www.kgeorgiy.info/courses/paradigms/homeworks.html)
 
 
+## Домашнее задание 13. Простые числа на Prolog
+
+Модификации
+ * *Базовая*
+    * Код должен находиться в файле `primes.pl`.
+    * [Исходный код тестов](prolog/prtest/primes/PrologPrimesTest.java)
+        * Запускать c аргументом `easy`, `hard` или `bonus`
+
+
+## Исходный код к лекциям по Prolog
+
+Запуск Prolog
+ * [Windows](prolog/RunProlog.cmd)
+ * [*nix](prolog/RunProlog.sh)
+
+Лекция 1. Введение в Пролог
+ * [Учебный план](prolog/examples/1_1_plan.pl)
+ * [Вычисления](prolog/examples/1_2_calc.pl)
+ * [Списки](prolog/examples/1_3_lists.pl)
+ * [Задача о расстановке ферзей](prolog/examples/1_4_queens.pl)
+
+
 ## Домашнее задание 12. Комбинаторные парсеры
 
 Модификации
@@ -39,7 +61,11 @@
         * `Sumexp` (`sumexp`) – сумма экспонент, `(sumexp 8 8 9)` примерно равно 14065;
         * `Softmax` (`Softmax`) – [softmax](https://ru.wikipedia.org/wiki/Softmax) первого аргумента, `(softmax 1 2 3)` примерно равно 0.09;
     * [Исходный код тестов](clojure/cljtest/object/ClojureObjectSumexpSoftmaxTest.java)
-
+ * *PowLog*. Дополнительно реализовать поддержку:
+    * бинарных операций:
+        * `Pw` (`pw`)– возведение в степень, `(pow 2 3)` равно 8;
+        * `lg` – логарифм абсолютной величины по основанию абсолютной величины, `(lg -8 -2)` равно 3.
+    * [Исходный код тестов](clojure/cljtest/object/ClojureObjectPwLgTest.java)
 
 ## Домашнее задание 10. Функциональные выражения на Clojure
 
