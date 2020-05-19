@@ -7,8 +7,8 @@ const variable = function (a) {
         return arguments[argName];
     }
 };
-const binary = fun => (a, b) => (x, y, z) => fun(a(x, y, z), b(x, y, z));
-const unary = fun => a => (x, y, z) => fun(a(x, y, z));
+const binary = fun => (a, b) => (...arg) => fun(a(...arg), b(...arg));
+const unary = fun => a => (...arg) => fun(a(...arg));
 const cube = unary(a => a * a * a);
 const negate = unary(a => -a);
 const cuberoot = unary(a => Math.cbrt(a));
@@ -17,24 +17,32 @@ const add = binary((a, b) => a + b);
 const subtract = binary((a, b) => a - b);
 const multiply = binary((a, b) => a * b);
 const divide = binary((a, b) => a / b);
-const operations = {
+const operationsBinary = {
     "+": add,
     "-": subtract,
     "/": divide,
     "*": multiply,
 };
+const operationsUnary = {
+    "negate": negate,
+    "cube" : cube,
+    "cuberoot" : cuberoot,
+};
 const parse = function (s) {
     let expression = [];
     let a = s.split(" ").filter(x => x !== '');
     for (let i = 0; i < a.length; i++) {
-        if (a[i] in operations) {
+        if (a[i] in operationsBinary) {
             let first = expression.pop();
             let second = expression.pop();
-            expression.push(operations[a[i]](second, first));
+            expression.push(operationsBinary[a[i]](second, first));
+        } else if (a[i] in operationsUnary) {
+            let first = expression.pop();
+            expression.push(operationsUnary[a[i]](first));
         } else
             expression.push(parSe(a[i]));
     }
-    return function (x) {
-        return expression[0](x);
+    return function (...arg) {
+        return expression[0](...arg);
     }
 };
