@@ -11,8 +11,8 @@
   (evaluate [this values] c)
   (diff [this str] zero))
 
-(def zero (new Const 0))
-(def one (new Const 1))
+(def zero (new Const 0.0))
+(def one (new Const 1.0))
 
 (deftype V [argName]
   Object

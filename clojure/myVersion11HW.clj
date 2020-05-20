@@ -11,8 +11,8 @@
   (evaluate [this values] c)
   (diff [this str] zero))
 
-(def zero (new Const 0))
-(def one (new Const 1))
+(def zero (new Const 0.0))
+(def one (new Const 1.0))
 
 (deftype V [argName]
   Object
@@ -44,7 +44,7 @@
   (new Operation * (fn [str args] (reduce (fn [f s] (Add (Multiply (.diff f str) s) (Multiply f (.diff s str)))) args)) "*" args))
 
 (defn Divide [& args]
-  (new Operation (fn [f s] (/ (double f) (double s))) (fn [str [f s]] (Divide (Subtract (Multiply (.diff f str) s) (Multiply f (.diff s str))) (Multiply s s))) "/" args))
+  (new Operation (fn [f s] (/ (double f) (double s))) (fn [str args] (reduce (fn [f s] (Divide (Subtract (Multiply (.diff f str) s) (Multiply f (.diff s str))) (Multiply s s))) args)) "/" args))
 
 (defn Negate [& args]
   (new Operation - (fn [str args] (p-operand Negate args str)) "negate" args))
