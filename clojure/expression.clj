@@ -30,30 +30,28 @@
   (toString [this] (str "(" stringOperation " " (clojure.string/join " " args) ")"))
   Expression
   (evaluate [this m] (apply operation (mapv (fn [x] (.evaluate x m)) args)))
-  (diff [this str] (ownDiff str args)))
-
-(defn p-operand [oper args str] (apply oper (mapv (fn [x] (.diff x str)) args)))
+  (diff [this str] (ownDiff (mapv (fn [x] (.diff x str)) args) args)))
 
 (defn Add [& args]
-  (new Operation + (fn [str args] (p-operand Add args str)) "+" args))
+  (new Operation + (fn [args' args] (apply Add args')) "+" args))
 
 (defn Subtract [& args]
-  (new Operation - (fn [str args] (p-operand Subtract args str)) "-" args))
+  (new Operation - (fn [args' args] (apply Subtract args')) "-" args))
 
 (defn Multiply [& args]
-  (new Operation * (fn [str args] (reduce (fn [f s] (Add (Multiply (.diff f str) s) (Multiply f (.diff s str)))) args)) "*" args))
+  (new Operation * (fn [[f' s'] [f s]] (Add (Multiply f' s) (Multiply f s'))) "*" args))
 
 (defn Divide [& args]
-  (new Operation (fn [f s] (/ (double f) (double s))) (fn [str [f s]] (Divide (Subtract (Multiply (.diff f str) s) (Multiply f (.diff s str))) (Multiply s s))) "/" args))
+  (new Operation (fn [f s] (/ (double f) (double s))) (fn [[f' s'] [f s]] (Divide (Subtract (Multiply f' s) (Multiply f s')) (Multiply s s))) "/" args))
 
 (defn Negate [& args]
-  (new Operation - (fn [str args] (p-operand Negate args str)) "negate" args))
+  (new Operation - (fn [args' args] (apply Negate args')) "negate" args))
 
 (defn Exp [& args]
-  (new Operation (fn [x] (Math/exp x)) (fn [str args] (Multiply (Exp (first args)) (.diff (first args) str))) "exp" args))
+  (new Operation (fn [x] (Math/exp x)) (fn [args' args] (Multiply (Exp (first args)) (first args'))) "exp" args))
 
 (defn Ln [& args]
-  (new Operation (fn [x] (Math/log (Math/abs x))) (fn [str args] (Multiply (Divide one (first args)) (.diff (first args) str))) "ln" args))
+  (new Operation (fn [x] (Math/log (Math/abs x))) (fn [args' args] (Multiply (Divide one (first args)) (first args'))) "ln" args))
 
 (defn evaluate [expr m]
   (.evaluate expr m))
@@ -111,7 +109,7 @@
   (if (-valid? result)
     (-return (f (-value result)) (-tail result))))
 
-; комбинирует два парсера a и b приминяет один за другим, использовав ф-ю f к результату парсера b
+; комбинирует два парсера a и b приминяет один за другим, использовав ф-ю f к результату парсера a и b
 (defn _combine [f a b]
   (fn [str]
     (let [ar ((force a) str)]
@@ -188,16 +186,31 @@
 
 ; json
 
+; парсит одну цифру
 (def *digit (+char "0123456789"))
+
+; парсим числа
 (def *number (+map read-string (+str (+plus *digit))))
+
+; парсим json - строки
 (def *string
   (+seqn 1 (+char "\"") (+str (+star (+char-not "\""))) (+char "\"")))
+
+; парсим пробелы
 (def *space (+char " \t\n\r"))
+
+; скипаем пробелы
 (def *ws (+ignore (+star *space)))
+; парсим слово null
 (def *null (+seqf (constantly 'null) (+char "n") (+char "u") (+char "l") (+char "l")))
+
+
 (def *all-chars (mapv char (range 32 128)))
 (apply str *all-chars)
+
+; парсим буквы
 (def *letter (+char (apply str (filter #(Character/isLetter %) *all-chars))))
+; я устал, но парсит после буквы проищвольное колличество символов
 (def *identifier (+str (+seqf cons *letter (+star (+or *letter *digit)))))
 (defn *seq [begin p end]
   (+seqn 1 (+char begin) (+opt (+seqf cons *ws p (+star (+seqn 1 *ws (+char ",") *ws p)))) *ws (+char end)))
@@ -222,6 +235,11 @@
             (*object [] (+map (partial reduce #(apply assoc %1 %2) {}) (*seq "{" (*member) "}")))
             (*value [] (+or *null *number *string (*object) (*array)))]
       (+parser (+seqn 0 *ws (*value))))))
+
+; Suffix parser
+(def *myLetter (+char "xyz"))
+(def operation (+or (+str (+seq (+char "n") (+char "e") (+char "g") (+char "a") (+char "t") (+char "e"))) (+str (+char "+-*/"))))
+(def expression (+seq *ws (+char "(") *ws (+or *number *myLetter expression) *ws (+or *number *myLetter expression) *ws operation *ws (+char ")")))
 
 (defn parseObjectSuffix [expression]
   ())
