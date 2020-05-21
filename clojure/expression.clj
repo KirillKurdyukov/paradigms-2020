@@ -1,15 +1,18 @@
 (definterface Expression
        (diff [str])
-       (evaluate [values]))
+       (evaluate [values])
+       (toStringSuffix []))
 
-(declare zero)
+(declare zero expression)
 
 (deftype Const [c]
   Object
   (toString [this] (format "%.1f" c))
   Expression
   (evaluate [this values] c)
-  (diff [this str] zero))
+  (diff [this str] zero)
+  (toStringSuffix [this] (format "%.1f" c)))
+
 
 (def zero (new Const 0.0))
 (def one (new Const 1.0))
@@ -19,7 +22,8 @@
   (toString [this] argName)
   Expression
   (evaluate [this m] (get m argName))
-  (diff [this str] (if (= str argName) one zero)))
+  (diff [this str] (if (= str argName) one zero))
+  (toStringSuffix [this] argName))
 
 (defn Constant [val] (new Const val))
 
@@ -30,7 +34,8 @@
   (toString [this] (str "(" stringOperation " " (clojure.string/join " " args) ")"))
   Expression
   (evaluate [this m] (apply operation (mapv (fn [x] (.evaluate x m)) args)))
-  (diff [this str] (ownDiff (mapv (fn [x] (.diff x str)) args) args)))
+  (diff [this str] (ownDiff (mapv (fn [x] (.diff x str)) args) args))
+  (toStringSuffix [this] (str "(" (clojure.string/join " " (mapv (fn [x] (.toStringSuffix x)) args)) ")")))
 
 (defn Add [& args]
   (new Operation + (fn [args' args] (apply Add args')) "+" args))
@@ -59,6 +64,8 @@
   (.diff expr str))
 (defn toString [expr]
   (.toString expr))
+(defn toStringSuffix [expr]
+  (.toStringSuffix expr))
 
 (def isVariable (fn [symbol] (if (or (= symbol 'x) (= symbol 'y) (= symbol 'z)) true false)))
 
@@ -187,7 +194,7 @@
 ; json
 
 ; парсит одну цифру
-(def *digit (+char "0123456789"))
+(def *digit (+char "0123456789."))
 
 ; парсим числа
 (def *number (+map read-string (+str (+plus *digit))))
@@ -237,9 +244,14 @@
       (+parser (+seqn 0 *ws (*value))))))
 
 ; Suffix parser
+(declare expression)
 (def *myLetter (+char "xyz"))
-(def operation (+or (+str (+seq (+char "n") (+char "e") (+char "g") (+char "a") (+char "t") (+char "e"))) (+str (+char "+-*/"))))
-(def expression (+seq *ws (+char "(") *ws (+or *number *myLetter expression) *ws (+or *number *myLetter expression) *ws operation *ws (+char ")")))
-
-(defn parseObjectSuffix [expression]
-  ())
+(def operation (+or (+str (+seq (+char "n") (+char "e") (+char "g") (+char "a") (+char "t") (+char "e"))) (+char "+-/")))
+(def binary (+seq *ws  (+ignore (+char "(")) *ws (+or *number *myLetter expression) *ws (+or *number *myLetter expression) *ws operation *ws (+ignore (+char ")"))))
+(def unary (+seq *ws  (+ignore (+char "(")) *ws (+or *number *myLetter expression) *ws operation *ws (+ignore (+char ")"))))
+(def expression (+or binary unary (+seq *ws *number *ws)))
+(defn parseSuffix [expression] (cond (number? expression) (Constant expression)
+                               (isVariable expression) (Variable (name expression))
+                               :else (apply (get mapOperation (name (last expression))) (mapv parseSuffix (drop-last expression)))))
+(defn parseObjectSuffix [expr]
+  (parseSuffix (-value (expression expr))))
