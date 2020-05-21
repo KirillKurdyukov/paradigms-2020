@@ -246,7 +246,8 @@
 ; Suffix parser
 (def *myLetter (+char "xyz"))
 (def *skipBracket (+ignore (+char "()")))
-(def *operation (+or (+str (+seq (+char "n") (+char "e") (+char "g") (+char "a") (+char "t") (+char "e"))) (+char "+-/*")))
+(defn longOperation [nameOperation] (apply +seqf str (mapv +char (mapv str (seq nameOperation)))))
+(def *operation (+or (longOperation "negate") (+char "+-/*")))
 (def *binary (+seq *ws  *skipBracket *ws (+or *number *myLetter (delay *expression)) *ws (+or *number *myLetter (delay *expression)) *ws *operation *ws *skipBracket))
 (def *unary (+seq *ws  *skipBracket *ws (+or *number *myLetter (delay *expression)) *ws *operation *ws *skipBracket))
 (def *expression (+or *binary *unary (+seqn 0 *ws *number *ws) (+seqn 0 *ws *myLetter *ws)))
