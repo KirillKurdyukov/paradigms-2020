@@ -250,7 +250,7 @@
 (def *operation (+or (longOperation "negate") (+char "+-/*")))
 (def *binary (+seq *ws  *skipBracket *ws (+or *number *myLetter (delay *expression)) *ws (+or *number *myLetter (delay *expression)) *ws *operation *ws *skipBracket))
 (def *unary (+seq *ws  *skipBracket *ws (+or *number *myLetter (delay *expression)) *ws *operation *ws *skipBracket))
-(def *expression (+or *binary *unary (+seqn 0 *ws *number *ws) (+seqn 0 *ws *myLetter *ws)))
+(def *expression (+or *binary *unary (+seqn 0 *ws (+or *myLetter *number) *ws)))
 (def isVariable1 (fn [symbol] (if (or (= symbol \x) (= symbol \y) (= symbol \z)) true false)))
 (defn parseSuffix [expression] (cond (number? expression) (Constant expression)
                                (isVariable1 expression) (Variable (str expression))
