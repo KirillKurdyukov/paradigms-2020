@@ -3,10 +3,12 @@ inc(N, R) :- number(N), !, R is N + 1.
 inc(N, R) :- number(R), !, N is R - 1.
 divisible(X, Y) :- X \= Y, N is Y * Y, N =< X, 0 is mod(X, Y).
 divisible(X, Y) :- X \= Y, inc(Y, Y1), divisible(X, Y1).
-prime(N) :- N > 1, Y is 2, \+divisible(N, Y).
+prime(N) :- primeTable(N), !.
+prime(N) :- N > 1, Y is 2, \+divisible(N, Y), assert(primeTable(N)).
 
 %composite(N) - проверяет, что N - составное.
-composite(N) :- N > 1, \+prime(N).
+composite(N) :- compositeTable(N), !.
+composite(N) :- N > 1, \+prime(N), assert(compositeTable(N)).
 
 %next_prime(N, Result) - следующее простое.
 next_prime(N, A) :- inc(N, R), prime(R), !, A is R.
