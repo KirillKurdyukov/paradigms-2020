@@ -6,7 +6,8 @@ import alice.tuprolog.exceptions.NoSolutionException;
 import base.Asserts;
 
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
@@ -34,7 +35,7 @@ public class PrologScript {
     public void consult(final String file) {
         final String path = PROLOG_ROOT.resolve(file).toString();
         try {
-            if (!prolog.solve(Struct.of("consult", PrologUtil.pure(path))).isSuccess()) {
+            if (!test("consult", Value.string(path))) {
                 throw error(null, "Error opening '%s'", path);
             }
         } catch (final PrologException e) {
@@ -42,16 +43,16 @@ public class PrologScript {
         }
     }
 
-    public boolean test(final Term term) {
-        return prolog.solve(term).isSuccess();
+    public boolean test(final String rule, final Object... args) {
+        return prolog.solve(Value.struct(rule, args).toTerm()).isSuccess();
     }
 
-    private List<Term> solve(final Var var, final Term term) {
+    private List<Term> solve(final Term term) {
         SolveInfo info = prolog.solve(term);
         final List<Term> values = new ArrayList<>();
         try {
             while (info.isSuccess()) {
-                values.add(info.getVarValue(var.getName()));
+                values.add(info.getVarValue(V.getName()));
                 if (!info.hasOpenAlternatives()) {
                     return values;
                 }
@@ -63,47 +64,40 @@ public class PrologScript {
         }
     }
 
-    public void solveNone(final Var var, final Struct term) {
-        final List<Term> values = solve(var, term);
+    public void solveNone(final String rule, final Object... args) {
+        final Term term = Value.struct(rule, args).toTerm();
+        final List<Term> values = solve(term);
         if (!values.isEmpty()) {
-            throw Asserts.error("No solutions expected for %s in %s%n  found: %d %s", var, term, values.size(), values);
+            throw Asserts.error("No solutions expected for %s in %s%n  found: %d %s", V, term, values.size(), values);
         }
     }
 
-    public Term solveOne(final Var var, final Term term) {
-        final List<Term> values = solve(var, term);
+    public Value solveOne(final String rule, final Object... args) {
+        final Term term = Value.struct(rule, args).toTerm();
+        final List<Term> values = solve(term);
         if (values.size() != 1) {
-            throw Asserts.error("Exactly one solution expected for %s in %s%n  found: %d %s", var, term, values.size(), values);
+            throw Asserts.error("Exactly one solution expected for %s in %s%n  found: %d %s", V, term, values.size(), values);
         }
-        return values.get(0);
-    }
-
-    private static Struct query(final String name, final Term[] args) {
-        final Term[] fullArgs = Arrays.copyOf(args, args.length + 1);
-        fullArgs[args.length] = PrologScript.V;
-        return Struct.of(name, fullArgs);
-    }
-
-    public void assertCall(final Object value, final String name, final Term... args) {
-        if (value != null) {
-            if (!Objects.equals(value, call(name, args))) {
-                throw Asserts.error("%s:%n  expected `%s`,%n    actual `%s`", query(name, args), value, call(name, args));
-            }
-        } else {
-            solveNone(PrologScript.V, query(name, args));
-        }
-    }
-
-    public Term call(final String name, final Term... args) {
-        return solveOne(V, query(name, args));
+        return Value.term(values.get(0));
     }
 
     public void addTheory(final Theory theory) {
         prolog.addTheory(theory);
     }
 
-    public void assertResult(final boolean expected, final String name, final Term... args) {
-        final Struct struct = Struct.of(name, args);
-        Asserts.assertEquals(struct.toString(), expected, test(struct));
+    public void assertResult(final boolean expected, final String rule, final Object... args) {
+        Asserts.assertEquals(Value.struct(rule, args).toString(), expected, test(rule, args));
+    }
+
+    public void assertQuery(final Object expected, final String rule, final Object... args) {
+        if (expected != null) {
+            final Term converted = Value.convert(expected).toTerm();
+            final Term actual = solveOne(rule, args).toTerm();
+            if (!converted.equals(actual)) {
+                throw Asserts.error("%s:%n  expected `%s`,%n    actual `%s`", Value.struct(rule, args), converted, actual);
+            }
+        } else {
+            solveNone(rule, args);
+        }
     }
 }

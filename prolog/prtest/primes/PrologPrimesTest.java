@@ -1,7 +1,5 @@
 package prtest.primes;
 
-import alice.tuprolog.Int;
-import alice.tuprolog.Struct;
 import base.Asserts;
 import expression.BaseTest;
 import prtest.PrologScript;
@@ -55,23 +53,23 @@ public class PrologPrimesTest extends BaseTest {
     }
 
     public void runTests() {
-        PrologUtil.measure("Init", () -> System.out.println("Init: " + prolog.test(Struct.of("init", Int.of(max)))));
+        PrologUtil.measure("Init", () -> System.out.println("Init: " + prolog.test("init", max)));
         PrologUtil.measure("checkPrimes", this::checkPrimes);
         PrologUtil.measure("checkComposites", this::checkComposites);
 
-        checkDivisors("prime_divisors", ArrayList::new);
+        checkDivisors("prime_divisors", true, ArrayList::new);
     }
 
-    void checkDivisors(final String function, final Supplier<Collection<Int>> factory) {
+    void checkDivisors(final String function, final boolean reversible, final Supplier<Collection<Integer>> factory) {
         PrologUtil.measure(function, () -> {
             for (int i = 1; i < 10; i++) {
-                checkDivisors(function, i, factory);
+                checkDivisors(function, reversible, i, factory);
             }
-            checkDivisors(function, 255, factory);
-            checkDivisors(function, 256, factory);
+            checkDivisors(function, reversible, 255, factory);
+            checkDivisors(function, reversible, 256, factory);
 
             for (int i = 0; i < primes.length / 10; i++) {
-                checkDivisors(function, randomN(), factory);
+                checkDivisors(function, reversible, randomN(), factory);
             }
         });
     }
@@ -94,32 +92,42 @@ public class PrologPrimesTest extends BaseTest {
 
     private void checkPrime(final int value) {
         counter.nextTest();
-        prolog.assertResult(isPrime.get(value), "prime", Int.of(value));
-        prolog.assertResult(!isPrime.get(value), "composite", Int.of(value));
+        prolog.assertResult(isPrime.get(value), "prime", value);
+        prolog.assertResult(!isPrime.get(value), "composite", value);
         counter.passed();
     }
 
-    private void checkDivisors(final String function, final int n, final Supplier<Collection<Int>> factory) {
+    private void checkDivisors(final String function, final boolean reversible, final int n, final Supplier<Collection<Integer>> factory) {
         counter.nextTest();
-        prolog.assertCall(PrologUtil.list(divisors(n, factory.get())), function, Int.of(n));
+        final List<Integer> divisors = divisors(n, factory.get());
+        prolog.assertQuery(divisors, function, n, PrologScript.V);
+
+        if (reversible) {
+            prolog.assertQuery(n, function, PrologScript.V, divisors);
+            final int hashCode = divisors.hashCode();
+            Collections.shuffle(divisors, random);
+            if (divisors.hashCode() != hashCode) {
+                prolog.assertQuery(null, function, PrologScript.V, divisors);
+            }
+        }
         counter.passed();
     }
 
-    private List<Int> divisors(final int n, final Collection<Int> divisors) {
+    private List<Integer> divisors(final int n, final Collection<Integer> divisors) {
         int value = n;
         for (final int prime : primes) {
             if (prime * prime > n) {
                 break;
             }
             while (value % prime == 0) {
-                divisors.add(Int.of(prime));
+                divisors.add(prime);
                 value /= prime;
             }
         }
         if (value > 1) {
-            divisors.add(Int.of(value));
+            divisors.add(value);
         }
-        return List.copyOf(divisors);
+        return new ArrayList<>(divisors);
     }
 
     public static void main(final String... args) {
