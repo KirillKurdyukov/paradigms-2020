@@ -217,7 +217,7 @@
 
 ; парсим буквы
 (def *letter (+char (apply str (filter #(Character/isLetter %) *all-chars))))
-; я устал, но парсит после буквы проищвольное колличество символов
+; я устал, но парсит после буквы произвольное колличество символов
 (def *identifier (+str (+seqf cons *letter (+star (+or *letter *digit)))))
 (defn *seq [begin p end]
   (+seqn 1 (+char begin) (+opt (+seqf cons *ws p (+star (+seqn 1 *ws (+char ",") *ws p)))) *ws (+char end)))
@@ -248,12 +248,14 @@
 (def *skipBracket (+ignore (+char "()")))
 (defn longOperation [nameOperation] (apply +seqf str (mapv +char (mapv str (seq nameOperation)))))
 (def *operation (+or (longOperation "negate") (+char "+-/*")))
-(def *binary (+seq *ws  *skipBracket *ws (+or *number *myLetter (delay *expression)) *ws (+or *number *myLetter (delay *expression)) *ws *operation *ws *skipBracket))
-(def *unary (+seq *ws  *skipBracket *ws (+or *number *myLetter (delay *expression)) *ws *operation *ws *skipBracket))
-(def *expression (+or *binary *unary (+seqn 0 *ws (+or *myLetter *number) *ws)))
+(def *binary (+seq *ws  *skipBracket *ws (+or *number *letter (delay *expression)) *ws (+or *number *letter (delay *expression)) *ws *operation *ws *skipBracket))
+(def *unary (+seq *ws  *skipBracket *ws (+or *number *letter (delay *expression)) *ws *operation *ws *skipBracket))
+(def *expression (+or *binary *unary (+seqn 0 *ws (+or *letter *number) *ws)))
 (def isVariable1 (fn [symbol] (if (or (= symbol \x) (= symbol \y) (= symbol \z)) true false)))
 (defn parseSuffix [expression] (cond (number? expression) (Constant expression)
                                (isVariable1 expression) (Variable (str expression))
                                :else (apply (get mapOperation (str (last expression))) (mapv parseSuffix (drop-last expression)))))
 (defn parseObjectSuffix [expr]
   (parseSuffix (-value (*expression expr))))
+;(def kirill (+star (+or *ws  *skipBracket *number *myLetter *operation (delay kirill))))
+;(tabulate kirill ["( 2 3 +)"])
