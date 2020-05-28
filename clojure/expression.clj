@@ -1,7 +1,7 @@
 (definterface Expression
-       (diff [str])
-       (evaluate [values])
-       (toStringSuffix []))
+  (diff [str])
+  (evaluate [values])
+  (toStringSuffix []))
 
 (declare zero *expression)
 
@@ -17,12 +17,13 @@
 (def zero (new Const 0.0))
 (def one (new Const 1.0))
 
+(defn getFirstElement [argName] (clojure.string/lower-case (first argName)))
 (deftype V [argName]
   Object
   (toString [this] argName)
   Expression
-  (evaluate [this m] (get m argName))
-  (diff [this str] (if (= str argName) one zero))
+  (evaluate [this m] (get m (getFirstElement argName)))
+  (diff [this str] (if (= str (getFirstElement argName)) one zero))
   (toStringSuffix [this] argName))
 
 (defn Constant [val] (new Const val))
@@ -244,18 +245,17 @@
       (+parser (+seqn 0 *ws (*value))))))
 
 ; Suffix parser
-(def *myLetter (+char "xyz"))
 (def *skipBracket (+ignore (+char "()")))
+(def *longLetter (+str (+plus (+char "XYZxyz"))))
 (defn longOperation [nameOperation] (apply +seqf str (mapv +char (mapv str (seq nameOperation)))))
 (def *operation (+or (longOperation "negate") (+char "+-/*")))
-(def *binary (+seq *ws  *skipBracket *ws (+or *number *letter (delay *expression)) *ws (+or *number *letter (delay *expression)) *ws *operation *ws *skipBracket))
-(def *unary (+seq *ws  *skipBracket *ws (+or *number *letter (delay *expression)) *ws *operation *ws *skipBracket))
-(def *expression (+or *binary *unary (+seqn 0 *ws (+or *letter *number) *ws)))
-(def isVariable1 (fn [symbol] (if (or (= symbol \x) (= symbol \y) (= symbol \z)) true false)))
+(def *parseLetAndVar (+or *number *longLetter (delay *expression)))
+(def *binary (+seq *ws *skipBracket *ws *parseLetAndVar *ws *parseLetAndVar *ws *operation *ws *skipBracket))
+(def *unary (+seq *ws *skipBracket *ws *parseLetAndVar *ws *operation *ws *skipBracket))
+(def *expression (+or *binary *unary (+seqn 0 *ws (+or *number *longLetter) *ws)))
+(def isVariable1 (fn [symbol] (if (string? symbol) true false)))
 (defn parseSuffix [expression] (cond (number? expression) (Constant expression)
-                               (isVariable1 expression) (Variable (str expression))
-                               :else (apply (get mapOperation (str (last expression))) (mapv parseSuffix (drop-last expression)))))
+                                     (isVariable1 expression) (Variable (str expression))
+                                     :else (apply (get mapOperation (str (last expression))) (mapv parseSuffix (drop-last expression)))))
 (defn parseObjectSuffix [expr]
   (parseSuffix (-value (*expression expr))))
-;(def kirill (+star (+or *ws  *skipBracket *number *myLetter *operation (delay kirill))))
-;(tabulate kirill ["( 2 3 +)"])

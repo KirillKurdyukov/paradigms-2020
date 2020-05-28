@@ -1,14 +1,22 @@
+init(MAX_N) :- sieve_of_Eratosthenes(2, MAX_N).
+
 %prime(N) - проверяет,что N простое число
 inc(N, R) :- number(N), !, R is N + 1.
 inc(N, R) :- number(R), !, N is R - 1.
+/*
+%for easy.
 divisible(X, Y) :- X \= Y, N is Y * Y, N =< X, 0 is mod(X, Y).
-divisible(X, Y) :- X \= Y, inc(Y, Y1), divisible(X, Y1).
-prime(N) :- primeTable(N), !.
-prime(N) :- N > 1, Y is 2, \+divisible(N, Y), assert(primeTable(N)).
+divisible(X, Y) :- X \= Y, inc(Y, Y1), divisible(X, Y1).*/
+%prime(N) :- N > 1, Y is 2, \+divisible(N, Y), assert(primeTable(N)).
+prime(N) :- \+ compositeTable(N), !.
+
+%for hard.
+make_composite(N, J) :- init(MAX_N), N =< MAX_N, assert(compositeTable(N)), NN is N + J, write(N), make_composite(NN, J).
+sieve_of_Eratosthenes(N, MAX_N) :- N =< MAX_N, \+compositeTable(N), NN is 2 * N, make_composite(NN, N).
+sieve_of_Eratosthenes(N, MAX_N) :- N =< MAX_N, compositeTable(N), inc(N,R), sieve_of_Eratosthenes(R).
 
 %composite(N) - проверяет, что N - составное.
 composite(N) :- compositeTable(N), !.
-composite(N) :- N > 1, \+prime(N), assert(compositeTable(N)).
 
 %next_prime(N, Result) - следующее простое.
 next_prime(N, A) :- inc(N, R), prime(R), !, A is R.
