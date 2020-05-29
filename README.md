@@ -19,13 +19,17 @@
     * Код должен находиться в файле `primes.pl`.
     * [Исходный код тестов](prolog/prtest/primes/PrologPrimesTest.java)
         * Запускать c аргументом `easy`, `hard` или `bonus`
- * *Palindrome* 
+ * *Palindrome*
     * Добавьте правило `prime_palindrome(N, K)`,
       определяющее, является ли `N` простым палиндромом в `K`-ичной системе счисления
     * [Исходный код тестов](prolog/prtest/primes/PrologPalindromeTest.java)
  * *Nth*
     * Добавьте правило `nth(N, P)`, подсчитывающее `N`-ое простое число
     * [Исходный код тестов](prolog/prtest/primes/PrologNthTest.java)
+ * *Lcm*
+    * Добавьте правило `lcm(A, B, LCM)`,
+      подсчитывающее НОК(`A`, `B`) через разложение на простые множители
+    * [Исходный код тестов](prolog/prtest/primes/PrologLcmTest.java)
 
 Для запуска тестов можно использовать скрипты
 [TestProlog.cmd](prolog/TestProlog.cmd) и [TestProlog.sh](prolog/TestProlog.sh)
