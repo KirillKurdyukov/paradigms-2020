@@ -46,6 +46,7 @@ map_remove(TreeMap, Key, Result)	:-
 	split(R, Key + 1, (NL, NR)),
 	merge(L, NR, Result).
 
+map_build([], null) :- !.
 map_build([(Key, Val)], TreeMap) :-
 	map_put(null, Key, Value, TreeMap), !.
 map_build([(Key, Val) | T], TreeMap) :-

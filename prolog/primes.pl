@@ -40,8 +40,8 @@ multiply_list([], R) :- R is 1.
 multiply_list([H | T], R) :- multiply_list(T, R1), R is H * R1.
 
 %correct_sort_list([H | T], R)
-correct_sort_list([H]).
-correct_sort_list([H1, H2 | T]) :- H1 =< H2, correct_sort_list([H2 | T]).
+correct_sort_list([H]) :- prime(H).
+correct_sort_list([H1, H2 | T]) :- H1 =< H2, prime(H1), correct_sort_list([H2 | T]).
 
 %prime_divisors - проверяющее, что список Divisors содержит все простые делители числа N, упорядоченные по возрастанию. Если N делится на простое число P несколько раз, то Divisors должен содержать соответствующее число копий P.
 prime_divisors(N, R) :- integer(N), divisors(N, 2, R), !.
