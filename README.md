@@ -19,6 +19,11 @@
     * Код должен находиться в файле `primes.pl`.
     * [Исходный код тестов](prolog/prtest/primes/PrologPrimesTest.java)
         * Запускать c аргументом `easy`, `hard` или `bonus`
+ * *Unique*
+    * Добавьте правило `unique_prime_divisors(N, Divisors)`,
+      возвращающее простые делители без повторов
+    * [Исходный код тестов](prolog/prtest/primes/PrologUniqueTest.java)
+
  * *Palindrome*
     * Добавьте правило `prime_palindrome(N, K)`,
       определяющее, является ли `N` простым палиндромом в `K`-ичной системе счисления
