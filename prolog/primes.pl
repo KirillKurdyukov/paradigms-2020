@@ -48,6 +48,18 @@ prime_divisors(N, R) :- integer(N), divisors(N, 2, R), !.
 prime_divisors(N, [H | T]) :- correct_sort_list([H | T]), multiply_list([H | T], N1), N is N1, !.
 prime_divisors(N, []) :- N is 1, !.
 
+%modification
+correct_sort_unique_list([H]) :- prime(H).
+correct_sort_unique_list([H1, H2 | T]) :- H1 < H2, prime(H1), correct_sort_list([H2 | T]).
+
+unique([H], [H]) :- !.
+unique([H1, H2| T], R) :- H1 \= H2, unique([H2 | T], R1), concat([H1], R1, R), !.
+unique([H1, H2| T], R) :- H1 is H2, unique([H2 | T], R1), concat([], R1, R), !.
+
+unique_prime_divisors(1, []) :- !.
+unique_prime_divisors(N, R) :- integer(N), divisors(N, 2, R1), unique(R1, R), !.
+unique_prime_divisors(N, [H | T]) :- correct_sort_unique_list([H | T]), multiply_list([H | T], N1), N is N1, !.
+unique_prime_divisors(N, []) :- N is 1, !.
 % EASY
 /*
 prime(N) - проверяет,что N простое число
