@@ -10,6 +10,10 @@
     * Код должен находиться в файле `tree-map.pl`.
     * [Исходный код тестов](prolog/prtest/tree/PrologTreeTest.java)
         * Запускать c аргументом `easy` или `hard`
+ * *Replace*
+    * Добавьте правило `map_replace(Map, Key, Value, Result)`,
+        заменяющего значения ключа на указанное, если ключ присутствует.
+    * [Исходный код тестов](prolog/prtest/tree/PrologTreeReplaceTest.java)
  * *CeilingKey*
     * Добавьте правило `map_ceilingKey(Map, Key, CeilingKey)`,
       возвращающее минимальный ключ, больший либо равный заданному.
