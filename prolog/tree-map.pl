@@ -46,3 +46,15 @@ map_build([], null) :- !.
 map_build([(Key, Val) | T], TreeMap) :-
 	map_build(T, NTreeMap),
 	map_put(NTreeMap, Key, Val, TreeMap), !.
+% ADDITION
+map_Key(TreeMap, Key, _) :-
+	split(TreeMap, Key, (L, R)),
+	NKey is Key + 1,
+	split(R, NKey, (node(Key, _, Y, _, _), _)), !.
+
+map_replace(null, _, _, null) :- !.
+map_replace(Map, Key, Value, Result) :-
+    map_Key(Map, Key, Value),
+	map_put(Map, Key, Value, Result), !.
+map_replace(Map, Key, Value, Map) :-
+    \+map_Key(Map, Key, Value), !.
